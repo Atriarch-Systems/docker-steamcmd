@@ -1,6 +1,17 @@
+#
+# SteamCMD Docker Image
+#
+# Original: https://github.com/GameServerManagers/docker-steamcmd
+# Fork: https://github.com/Atriarch-Systems/docker-steamcmd
+#
+# Original Copyright (c) LinuxGSM <me@danielgibbs.co.uk>
+# Modifications Copyright (c) Atriarch Systems <postmaster@mail.atriarch.systems>
+#
+
 FROM ubuntu:20.04
 
-LABEL maintainer="Atriarch Systems <postmaster@mail.atriarch.systems>"
+LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
+LABEL maintainer.fork="Atriarch Systems <postmaster@mail.atriarch.systems>"
 ARG DEBIAN_FRONTEND=noninteractive
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -11,7 +22,7 @@ RUN echo "**** Install SteamCMD ****" \
   && echo steam steam/license note '' | debconf-set-selections \
   && dpkg --add-architecture i386 \
   && apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates locales lib32gcc1 libsdl2-2.0-0:i386 tzdata steamcmd \
+  && apt-get install -y --no-install-recommends ca-certificates locales lib32gcc-s1 libsdl2-2.0-0:i386 tzdata steamcmd \
   && ln -s /usr/games/steamcmd /usr/bin/steamcmd \
   && apt-get -y autoremove \
   && apt-get -y clean \

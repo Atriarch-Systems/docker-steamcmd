@@ -1,0 +1,150 @@
+name: Build and Push SteamCMD Images (Atriarch)
+# Builds and pushes SteamCMD images to Atriarch registry
+# Triggers downstream docker-linuxgsm rebuild when complete
+
+on:
+  push:
+    branches: [atriarch]
+    paths:
+      - 'Dockerfile*'
+  workflow_dispatch:
+
+jobs:
+  build-ubuntu-2404:
+    name: Build Ubuntu 24.04
+    runs-on: [self-hosted, Linux, X64, amd64, arc-amd64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: atriarch
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Atriarch Registry
+        uses: docker/login-action@v3
+        with:
+          registry: docker.atriarch.systems
+          username: ${{ secrets.ATRIARCH_REGISTRY_USERNAME }}
+          password: ${{ secrets.ATRIARCH_REGISTRY_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push (Ubuntu 24.04)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.ubuntu-2404
+          platforms: linux/amd64
+          push: true
+          tags: |
+            docker.atriarch.systems/steamcmd:latest
+            docker.atriarch.systems/steamcmd:ubuntu-24.04
+            ghcr.io/atriarch-systems/steamcmd:latest
+            ghcr.io/atriarch-systems/steamcmd:ubuntu-24.04
+
+  build-ubuntu-2204:
+    name: Build Ubuntu 22.04
+    runs-on: [self-hosted, Linux, X64, amd64, arc-amd64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: atriarch
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Atriarch Registry
+        uses: docker/login-action@v3
+        with:
+          registry: docker.atriarch.systems
+          username: ${{ secrets.ATRIARCH_REGISTRY_USERNAME }}
+          password: ${{ secrets.ATRIARCH_REGISTRY_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push (Ubuntu 22.04)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.ubuntu-2204
+          platforms: linux/amd64
+          push: true
+          tags: |
+            docker.atriarch.systems/steamcmd:ubuntu-22.04
+            ghcr.io/atriarch-systems/steamcmd:ubuntu-22.04
+
+  build-ubuntu-2004:
+    name: Build Ubuntu 20.04
+    runs-on: [self-hosted, Linux, X64, amd64, arc-amd64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: atriarch
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Atriarch Registry
+        uses: docker/login-action@v3
+        with:
+          registry: docker.atriarch.systems
+          username: ${{ secrets.ATRIARCH_REGISTRY_USERNAME }}
+          password: ${{ secrets.ATRIARCH_REGISTRY_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push (Ubuntu 20.04)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.ubuntu-2004
+          platforms: linux/amd64
+          push: true
+          tags: |
+            docker.atriarch.systems/steamcmd:ubuntu-20.04
+            ghcr.io/atriarch-systems/steamcmd:ubuntu-20.04
+
+  trigger-downstream:
+    name: Trigger docker-linuxgsm rebuild
+    needs: [build-ubuntu-2404, build-ubuntu-2204, build-ubuntu-2004]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger docker-linuxgsm workflow
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/Atriarch-Systems/docker-linuxgsm/actions/workflows/build-atriarch.yml/dispatches \
+            -d '{"ref":"atriarch"}'
+
+  package-cleanup:
+    name: Cleanup Old GitHub Packages
+    needs: [build-ubuntu-2004, build-ubuntu-2204, build-ubuntu-2404]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Package Versions
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: steamcmd
+          package-type: container
+          min-versions-to-keep: 3
+          delete-only-untagged-versions: true
