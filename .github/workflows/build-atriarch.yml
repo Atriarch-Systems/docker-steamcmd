@@ -25,9 +25,9 @@ jobs:
       - name: Login to Atriarch Registry
         uses: docker/login-action@v3
         with:
-          registry: docker.atriarch.systems
-          username: ${{ secrets.ATRIARCH_REGISTRY_USERNAME }}
-          password: ${{ secrets.ATRIARCH_REGISTRY_PASSWORD }}
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -44,8 +44,8 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            docker.atriarch.systems/steamcmd:latest
-            docker.atriarch.systems/steamcmd:ubuntu-24.04
+            ${{ secrets.DOCKER_REGISTRY }}/steamcmd:latest
+            ${{ secrets.DOCKER_REGISTRY }}/steamcmd:ubuntu-24.04
             ghcr.io/atriarch-systems/steamcmd:latest
             ghcr.io/atriarch-systems/steamcmd:ubuntu-24.04
 
@@ -64,9 +64,9 @@ jobs:
       - name: Login to Atriarch Registry
         uses: docker/login-action@v3
         with:
-          registry: docker.atriarch.systems
-          username: ${{ secrets.ATRIARCH_REGISTRY_USERNAME }}
-          password: ${{ secrets.ATRIARCH_REGISTRY_PASSWORD }}
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -83,7 +83,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            docker.atriarch.systems/steamcmd:ubuntu-22.04
+            ${{ secrets.DOCKER_REGISTRY }}/steamcmd:ubuntu-22.04
             ghcr.io/atriarch-systems/steamcmd:ubuntu-22.04
 
   build-ubuntu-2004:
@@ -101,9 +101,9 @@ jobs:
       - name: Login to Atriarch Registry
         uses: docker/login-action@v3
         with:
-          registry: docker.atriarch.systems
-          username: ${{ secrets.ATRIARCH_REGISTRY_USERNAME }}
-          password: ${{ secrets.ATRIARCH_REGISTRY_PASSWORD }}
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -120,7 +120,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            docker.atriarch.systems/steamcmd:ubuntu-20.04
+            ${{ secrets.DOCKER_REGISTRY }}/steamcmd:ubuntu-20.04
             ghcr.io/atriarch-systems/steamcmd:ubuntu-20.04
 
   trigger-downstream:
@@ -131,7 +131,7 @@ jobs:
       - name: Trigger docker-linuxgsm workflow
         run: |
           curl -X POST \
-            -H "Authorization: token ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.GITOPS_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/Atriarch-Systems/docker-linuxgsm/actions/workflows/build-atriarch.yml/dispatches \
             -d '{"ref":"atriarch"}'
