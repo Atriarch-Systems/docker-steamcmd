@@ -39,6 +39,8 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_REGISTRY }}/steamcmd:latest
             ${{ secrets.DOCKER_REGISTRY }}/steamcmd:ubuntu-24.04
+          cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/steamcmd:cache-ubuntu-24.04
+          cache-to: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/steamcmd:cache-ubuntu-24.04,mode=max
 
   build-ubuntu-2204:
     name: Build Ubuntu 22.04
@@ -68,6 +70,8 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_REGISTRY }}/steamcmd:ubuntu-22.04
+          cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/steamcmd:cache-ubuntu-22.04
+          cache-to: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/steamcmd:cache-ubuntu-22.04,mode=max
 
   build-ubuntu-2004:
     name: Build Ubuntu 20.04
@@ -97,6 +101,8 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_REGISTRY }}/steamcmd:ubuntu-20.04
+          cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/steamcmd:cache-ubuntu-20.04
+          cache-to: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/steamcmd:cache-ubuntu-20.04,mode=max
 
   trigger-downstream:
     name: Trigger docker-linuxgsm rebuild
