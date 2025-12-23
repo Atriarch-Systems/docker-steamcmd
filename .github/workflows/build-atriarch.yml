@@ -36,6 +36,8 @@ jobs:
           file: ./Dockerfile.ubuntu-2404
           platforms: linux/amd64
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ secrets.DOCKER_REGISTRY }}/steamcmd:latest
             ${{ secrets.DOCKER_REGISTRY }}/steamcmd:ubuntu-24.04
@@ -68,6 +70,8 @@ jobs:
           file: ./Dockerfile.ubuntu-2204
           platforms: linux/amd64
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ secrets.DOCKER_REGISTRY }}/steamcmd:ubuntu-22.04
           cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/steamcmd:cache-ubuntu-22.04
@@ -99,6 +103,8 @@ jobs:
           file: ./Dockerfile.ubuntu-2004
           platforms: linux/amd64
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ secrets.DOCKER_REGISTRY }}/steamcmd:ubuntu-20.04
           cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY }}/steamcmd:cache-ubuntu-20.04
